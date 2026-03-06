@@ -4153,10 +4153,13 @@ pub fn mouseButtonCallback(
 
     // Middle-click pastes from our selection clipboard
     if (button == .middle and action == .press) {
-        const clipboard: apprt.Clipboard = if (self.rt_surface.supportsClipboard(.selection))
-            .selection
-        else
-            .standard;
+        const clipboard: apprt.Clipboard = switch (self.config.copy_on_select) {
+            .clipboard => .standard,
+            .true, .false => if (self.rt_surface.supportsClipboard(.selection))
+                .selection
+            else
+                .standard,
+        };
         _ = try self.startClipboardRequest(clipboard, .{ .paste = {} });
     }
 
